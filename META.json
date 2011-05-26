@@ -1,5 +1,5 @@
 {
-   "abstract" : "Removes extra leading spaces from code blocks in HTML rendered from Pod",
+   "abstract" : "Reformats HTML code blocks coming from Pod verbatim paragraphs",
    "author" : [
       "Emanuele Zeppieri <emazep@cpan.org>"
    ],
@@ -57,6 +57,6 @@
          "web" : "http://github.com/emazep/HTML-PodCodeReformat"
       }
    },
-   "version" : "0.10000"
+   "version" : "0.20000"
 }
 

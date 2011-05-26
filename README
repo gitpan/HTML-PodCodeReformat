@@ -1,9 +1,9 @@
 NAME
-    HTML::PodCodeReformat - Removes extra leading spaces from code blocks in
-    HTML rendered from Pod
+    HTML::PodCodeReformat - Reformats HTML code blocks coming from Pod
+    verbatim paragraphs
 
 VERSION
-    version 0.10000
+    version 0.20000
 
 SYNOPSIS
         use HTML::PodCodeReformat;
@@ -41,6 +41,11 @@ SYNOPSIS
         </html>
 
 DESCRIPTION
+    This module is mainly intended to strip the extra leading spaces which
+    appear in text lines inside "<pre>...</pre>" blocks (corresponding to
+    Pod *verbatim paragraphs*) in an HTML-transformed pod (then it can
+    optionally apply other transformations as well on such blocks).
+
     perlpodspec states that (leading) *whitespace is significant in verbatim
     paragraphs*, that is, they must be preserved in the final output (e.g.
     HTML).
@@ -70,9 +75,9 @@ DESCRIPTION
 
     However it requires you to pass the leading string to strip, which, to
     work across different pods, of course requires the indentation of
-    verbatim blocks to be consistent (which is very unlikely, if said pods
-    come from many different authors). Alternatively, an heuristic to remove
-    the extra indentation can be provided (through a code reference).
+    verbatim paragraphs to be consistent (which is very unlikely, if said
+    pods come from many different authors). Alternatively, an heuristic to
+    remove the extra indentation can be provided (through a code reference).
 
     Though much more limited in scope, since it works only on HTML, this
     module offers instead a ready-made simple but effective heuristic, which
@@ -92,7 +97,7 @@ METHODS
     It creates and returns a new "HTML::PodCodeReformat" object. It accepts
     its options either as a hash or a hashref.
 
-    It can take the following single option:
+    It can take the following options:
 
     *   "squash_blank_lines"
 
@@ -104,16 +109,32 @@ METHODS
         "pre" block will be treated as *normal* lines, that is, they will be
         stripped only of the extra leading whitespaces, as any other line.
 
+    *   "line_numbers"
+
+        Boolean option which, when set to true, causes every line in a "pre"
+        text to be wrapped in "<li>...</li>" tags, and the whole text to be
+        wrapped in "<ol>...</ol>" tags (so that a line number is prepended
+        to every line in the "pre" text, when the HTML document is viewed in
+        a browser).
+
+        In this case the original newlines in the "pre" text are removed, to
+        not add extra empty lines when the HTML document is rendered.
+
+        It defaults to false.
+
+    The above options can be read/set after the object construnction through
+    their corresponding methods as well.
+
   "reformat_pre"
-    *   "$f->reformat_pre( $filename )"
+    *   "reformat_pre( $filename )"
 
-    *   "$f->reformat_pre( $filehandle )"
+    *   "reformat_pre( $filehandle )"
 
-    *   "$f->reformat_pre( \$string )"
+    *   "reformat_pre( \$string )"
 
-    It removes the *extra* leading spaces from the lines contained in every
-    "<pre>...</pre>" block present in the given HTML document (of course
-    preserving any *real* indentation *inside* code, as showed in the
+    Instance method which removes the *extra* leading spaces from the lines
+    contained in every "<pre>...</pre>" block in the given HTML document (of
+    course preserving any *real* indentation *inside* code, as showed in the
     "SYNOPSIS" above), and returns a string containing the HTML code
     modified that way.
 
@@ -123,21 +144,26 @@ METHODS
     It would work even on nested "pre" blocks, though this situation has
     never been encountered in *real* pods.
 
-ALGORITHM
-    The adopted algorithm is extremely simple.
+    If the options "squash_blank_lines" and "line_numbers" are set, the
+    corresponding transformations (described above) are applied as well
+    (after the extra leading spaces removal).
 
-    Skipping some minor details, it basically works this way: for each "pre"
-    block in the given HTML document, first the length of the shortest
-    leading whitespace string across all the lines in the block is
-    calculated (ignoring empty lines), then every line in the block is
-    *shifted to the left* by such amount.
+ALGORITHM
+    The adopted algorithm to remove the extra leading whitespaces is
+    extremely simple.
+
+    Skipping some minor details, it basically works this way: given an HTML
+    document, for each text block inside "<pre>...</pre>" tags, first the
+    length of the shortest leading whitespace string across all the lines in
+    the block is calculated (ignoring empty lines), then every line in the
+    block is *shifted to the left* by such amount.
 
 LIMITATIONS
     With the exception explained below in the "Non-limitations" section, any
-    "<pre>...</pre>" block which has *extra* leading spaces will be *fixed*.
-    This will happen also if a given verbatim paragraph (most probably
-    composed of text, not code) is intended to stay indented (no pun
-    intended) that way, such as in, for example:
+    "<pre>...</pre>" block which has *extra* leading spaces will be
+    reformatted. This will happen also if a given verbatim paragraph (most
+    probably composed of text, not code) is intended to stay indented (no
+    pun intended) that way, such as in, for example:
 
             This text
             should really stay
@@ -165,15 +191,11 @@ LIMITATIONS
         from Text::Format.
 
         That's why such blocks will be left unaltered, and that's why it's
-        hopefully more an advantage than a limitation ;-)
+        more an advantage than a limitation (hopefully).
 
     *   Working only on "pre" tags may seem a limitation, but this is the
         way any Pod to HTML transformer I'm aware of renders a Pod verbatim
-        paragraph.
-
-        If you need to wrap your code in other HTML tags (for example "ol"
-        and "li" to add line numbers), just reformat your html with this
-        module first.
+        paragraph in HTML.
 
 AUTHOR
     Emanuele Zeppieri, "<emazep@cpan.org>"

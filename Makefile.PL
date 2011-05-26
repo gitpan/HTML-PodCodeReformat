@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Removes extra leading spaces from code blocks in HTML rendered from Pod',
+  'ABSTRACT' => 'Reformats HTML code blocks coming from Pod verbatim paragraphs',
   'AUTHOR' => 'Emanuele Zeppieri <emazep@cpan.org>',
   'BUILD_REQUIRES' => {
     'English' => '0',
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     'Pod::Usage' => '0',
     'constant' => '0'
   },
-  'VERSION' => '0.10000',
+  'VERSION' => '0.20000',
   'test' => {
     'TESTS' => 't/*.t'
   }
